@@ -21,11 +21,13 @@ async function runMigration() {
       .filter(stmt => stmt.length > 0);
 
     for (const statement of statements) {
+      await client.query('SAVEPOINT migration_step');
       try {
         await client.query(statement);
+        await client.query('RELEASE SAVEPOINT migration_step');
         console.log(`✓ Executed: ${statement.split('\n')[0].substring(0, 80)}...`);
       } catch (err) {
-        // 如果错误是"type already exists"或"relation already exists"，则忽略
+        await client.query('ROLLBACK TO SAVEPOINT migration_step');
         if (err.message.includes('already exists') || err.message.includes('duplicate')) {
           console.log(`⚠  Already exists: ${statement.split('\n')[0].substring(0, 80)}...`);
         } else {
