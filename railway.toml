@@ -35,8 +35,7 @@ watchPatterns = ["**"]
     JWT_SECRET = { required = true }
     JWT_ACCESS_EXPIRES_IN = "2h"
     JWT_REFRESH_EXPIRES_IN = "7d"
-    # PostgreSQL 连接字符串将由 Railway 插件自动提供
-    DATABASE_URL = "postgresql://${PGUSER}:${PGPASSWORD}@${PGHOST}:${PGPORT}/${PGDATABASE}"
+    # DATABASE_URL 将由 Railway PostgreSQL 插件自动提供
     # Redis 可选，暂时注释
     # REDIS_URL = "redis://${REDISHOST}:${REDISPORT}"
 
