@@ -9,8 +9,12 @@ watchPatterns = ["**"]
   [service.build]
     nixpacks = { install = ["nodejs-20.x", "postgresql"] }
     buildCommand = """
-      cd client && npm ci && npm run build
-      cd ../server && npm ci
+      # 安装客户端依赖（包含devDependencies）
+      cd client && npm install --include=dev
+      # 构建前端
+      npm run build
+      # 安装服务器依赖（生产环境）
+      cd ../server && npm ci --omit=dev
     """
 
   [service.deploy]
@@ -18,7 +22,7 @@ watchPatterns = ["**"]
       # 等待数据库就绪
       sleep 5
       # 运行数据库迁移
-      cd server && psql "${DATABASE_URL}" -f db/migrations/001_create_enums_and_tables.sql
+      node server/db/migrate.js
       # 启动应用
       node server.js
     """
