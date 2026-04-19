@@ -1,0 +1,42 @@
+[build]
+builder = "nixpacks"
+watchPatterns = ["**"]
+
+[service]
+  name = "jobtracker"
+  root = "."
+
+  [service.build]
+    nixpacks = { install = ["nodejs-20.x", "postgresql"] }
+    buildCommand = """
+      cd client && npm ci && npm run build
+      cd ../server && npm ci
+    """
+
+  [service.deploy]
+    start = """
+      # 等待数据库就绪
+      sleep 5
+      # 运行数据库迁移
+      cd server && psql "${DATABASE_URL}" -f db/migrations/001_create_enums_and_tables.sql
+      # 启动应用
+      node server.js
+    """
+    healthcheckPath = "/api/auth/me"
+    healthcheckTimeout = 30
+
+  [service.variables]
+    PORT = "4000"
+    NODE_ENV = "production"
+    JWT_SECRET = { required = true }
+    JWT_ACCESS_EXPIRES_IN = "2h"
+    JWT_REFRESH_EXPIRES_IN = "7d"
+    # PostgreSQL 连接字符串将由 Railway 插件自动提供
+    DATABASE_URL = "postgresql://${PGUSER}:${PGPASSWORD}@${PGHOST}:${PGPORT}/${PGDATABASE}"
+    # Redis 可选，暂时注释
+    # REDIS_URL = "redis://${REDISHOST}:${REDISPORT}"
+
+[plugins]
+  [plugins.postgresql]
+    type = "postgresql"
+    version = "15"
