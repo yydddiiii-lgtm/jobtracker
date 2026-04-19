@@ -10,7 +10,7 @@ watchPatterns = ["**"]
     nixpacks = { install = ["nodejs-20.x", "postgresql"] }
     buildCommand = """
       # 安装客户端依赖（包含devDependencies）
-      cd client && npm install --include=dev
+      cd client && NPM_CONFIG_PRODUCTION=false npm install
       # 构建前端
       npm run build
       # 安装服务器依赖（生产环境）
