@@ -17,8 +17,8 @@ async function runMigration() {
     // 执行SQL（按语句分割，排除空行和注释）
     const statements = sql
       .split(';')
-      .map(stmt => stmt.trim())
-      .filter(stmt => stmt.length > 0 && !stmt.startsWith('--'));
+      .map(stmt => stmt.replace(/--[^\n]*/g, '').trim())
+      .filter(stmt => stmt.length > 0);
 
     for (const statement of statements) {
       try {
