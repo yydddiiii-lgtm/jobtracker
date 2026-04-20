@@ -1,1 +1,1 @@
-ALTER TABLE applications ADD COLUMN referral_code VARCHAR(100);
+ALTER TABLE applications ADD COLUMN IF NOT EXISTS referral_code VARCHAR(100);

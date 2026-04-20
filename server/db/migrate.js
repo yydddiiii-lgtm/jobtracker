@@ -13,7 +13,10 @@ async function runMigration() {
 
     console.log('Running database migration...');
 
+    console.log(`[migrate] Found migration files: ${files.join(', ')}`);
+
     for (const file of files) {
+      console.log(`[migrate] Running: ${file}`);
       const sql = fs.readFileSync(path.join(migrationsDir, file), 'utf8');
       const statements = sql
         .split(';')
