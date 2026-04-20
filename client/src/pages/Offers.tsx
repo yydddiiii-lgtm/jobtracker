@@ -231,7 +231,7 @@ export default function Offers() {
               ) : (
                 <div className="px-5 py-4 grid grid-cols-5 gap-4 text-sm">
                   <InfoCell label="月薪" value={offer.base_salary ? `${offer.base_salary.toLocaleString()} 元` : null} />
-                  <InfoCell label="城市" value={offer.city} />
+                  <InfoCell label="城市" value={offer.city ?? offer.app_city ?? null} />
                   <InfoCell label="部门" value={offer.department} />
                   <InfoCell label="编制" value={offer.headcount_type ? HEADCOUNT_LABELS[offer.headcount_type] : null} />
                   <InfoCell

@@ -37,6 +37,15 @@ const updateByApplication = async (req, res, next) => {
   }
 };
 
+const removeByApplication = async (req, res, next) => {
+  try {
+    await offerService.removeByApplication(req.params.id, req.user.id);
+    success(res, {});
+  } catch (err) {
+    next(err);
+  }
+};
+
 const getByApplication = async (req, res, next) => {
   try {
     const offer = await offerService.getByApplication(req.params.id, req.user.id);
@@ -46,4 +55,4 @@ const getByApplication = async (req, res, next) => {
   }
 };
 
-module.exports = { list, create, getByApplication, update, updateByApplication };
+module.exports = { list, create, getByApplication, removeByApplication, update, updateByApplication };

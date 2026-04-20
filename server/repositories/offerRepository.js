@@ -2,7 +2,8 @@ const db = require('../db');
 
 const findAll = async (userId) => {
   const { rows } = await db.query(
-    `SELECT o.*, a.company_name, a.position, a.job_type
+    `SELECT o.*, a.company_name, a.position, a.job_type,
+            a.city AS app_city, a.salary_min AS app_salary_min, a.salary_max AS app_salary_max
      FROM offers o
      JOIN applications a ON a.id = o.application_id
      WHERE a.user_id = $1
@@ -48,4 +49,9 @@ const update = async (id, fields) => {
   return rows[0] || null;
 };
 
-module.exports = { findAll, findByApplication, findById, create, update };
+const remove = async (id) => {
+  const { rowCount } = await db.query('DELETE FROM offers WHERE id = $1', [id]);
+  return rowCount > 0;
+};
+
+module.exports = { findAll, findByApplication, findById, create, update, remove };

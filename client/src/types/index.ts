@@ -86,6 +86,9 @@ export interface Offer {
   updated_at: string
   company_name?: string
   position?: string
+  app_city?: string | null
+  app_salary_min?: number | null
+  app_salary_max?: number | null
 }
 
 export interface Notification {

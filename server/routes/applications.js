@@ -19,6 +19,7 @@ router.post('/:id/documents', documentCtrl.create);
 router.get('/:id/offer', offerCtrl.getByApplication);
 router.post('/:id/offer', offerCtrl.create);
 router.patch('/:id/offer', offerCtrl.updateByApplication);
+router.delete('/:id/offer', offerCtrl.removeByApplication);
 router.get('/:id/stage-logs', appCtrl.getStageLogs);
 
 module.exports = router;

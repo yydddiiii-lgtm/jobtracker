@@ -225,10 +225,10 @@ export default function ApplicationDetail() {
           </div>
         </div>
 
-        {/* Offer 接受状态 */}
+        {/* Offer 状态与操作 */}
         {offer && (
-          <div className="flex items-center gap-2 mb-3">
-            <span className="text-xs text-gray-400">Offer 决定：</span>
+          <div className="flex items-center gap-2 mb-3 flex-wrap">
+            <span className="text-xs text-gray-400">Offer：</span>
             {offer.is_accepted === true && (
               <span className="px-2 py-0.5 bg-green-50 text-green-600 rounded-full text-xs font-medium border border-green-200">已接受 🎉</span>
             )}
@@ -238,12 +238,48 @@ export default function ApplicationDetail() {
             {offer.is_accepted === null && (
               <span className="px-2 py-0.5 bg-gray-100 text-gray-400 rounded-full text-xs">待决定</span>
             )}
-            {offer.base_salary && (
+            {offer.base_salary != null && (
               <span className="text-xs text-gray-500">· {offer.base_salary.toLocaleString()} 元/月</span>
             )}
-            {offer.city && offer.city !== app.city && (
-              <span className="text-xs text-gray-500">· {offer.city}</span>
+            {offer.is_accepted === null && (
+              <>
+                <button
+                  onClick={async () => {
+                    await apiClient.patch(`/applications/${app.id}/offer`, { is_accepted: true })
+                    setOffer(o => o ? { ...o, is_accepted: true } : o)
+                    toast.success('已接受 Offer 🎉')
+                  }}
+                  className="px-2 py-0.5 bg-green-600 text-white rounded-lg text-xs font-medium hover:bg-green-700 transition-colors"
+                >接受</button>
+                <button
+                  onClick={async () => {
+                    await apiClient.patch(`/applications/${app.id}/offer`, { is_accepted: false })
+                    setOffer(o => o ? { ...o, is_accepted: false } : o)
+                    toast.success('已拒绝 Offer')
+                  }}
+                  className="px-2 py-0.5 border border-red-300 text-red-500 rounded-lg text-xs font-medium hover:bg-red-50 transition-colors"
+                >拒绝</button>
+              </>
             )}
+            {offer.is_accepted !== null && (
+              <button
+                onClick={async () => {
+                  await apiClient.patch(`/applications/${app.id}/offer`, { is_accepted: null })
+                  setOffer(o => o ? { ...o, is_accepted: null } : o)
+                  toast.success('已撤回决定')
+                }}
+                className="text-xs text-gray-400 hover:text-gray-600 border border-gray-200 rounded-lg px-2 py-0.5 transition-colors"
+              >撤回决定</button>
+            )}
+            <button
+              onClick={async () => {
+                if (!confirm('确认删除此 Offer？')) return
+                await apiClient.delete(`/applications/${app.id}/offer`)
+                setOffer(null)
+                toast.success('Offer 已删除')
+              }}
+              className="text-xs text-gray-300 hover:text-red-400 transition-colors ml-1"
+            >删除</button>
           </div>
         )}
 

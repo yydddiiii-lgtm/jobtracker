@@ -51,4 +51,12 @@ const updateByApplication = async (applicationId, userId, body) => {
   return offerRepo.update(offer.id, fields);
 };
 
-module.exports = { listAll, createForApplication, getByApplication, update, updateByApplication };
+const removeByApplication = async (applicationId, userId) => {
+  const app = await appRepo.findById(applicationId, userId);
+  if (!app) throw Errors.notFound('Application not found');
+  const offer = await offerRepo.findByApplication(applicationId);
+  if (!offer) throw Errors.notFound('Offer not found');
+  return offerRepo.remove(offer.id);
+};
+
+module.exports = { listAll, createForApplication, getByApplication, update, updateByApplication, removeByApplication };
