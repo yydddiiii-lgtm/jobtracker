@@ -4,7 +4,7 @@
 
 -- ============ ENUM Types ============
 
-CREATE TYPE job_type_enum AS ENUM ('campus', 'internship');
+CREATE TYPE job_type_enum AS ENUM ('campus', 'internship', 'daily_internship', 'summer_internship', 'winter_internship', 'fulltime');
 
 CREATE TYPE stage_enum AS ENUM (
   'pending', 'applied', 'written_test',
