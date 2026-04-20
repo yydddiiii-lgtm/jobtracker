@@ -55,7 +55,7 @@ const create = async ({ userId, company_name, position, job_type, stage, city, s
        (user_id, company_name, position, job_type, stage, city, salary_min, salary_max, deadline, job_url, notes, priority, referral_code)
      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
      RETURNING *`,
-    [userId, company_name, position, job_type || 'daily_internship', stage || 'pending',
+    [userId, company_name, position, job_type || 'campus', stage || 'pending',
      city || null, salary_min || null, salary_max || null,
      deadline || null, job_url || null, notes || null, priority || '2', referral_code || null
     ]
