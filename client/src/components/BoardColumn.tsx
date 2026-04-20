@@ -6,9 +6,10 @@ interface Props {
   stage: Stage
   label: string
   applications: Application[]
+  onDelete: (id: string) => void
 }
 
-export default function BoardColumn({ stage, label, applications }: Props) {
+export default function BoardColumn({ stage, label, applications, onDelete }: Props) {
   return (
     <div className="flex flex-col flex-1 min-w-[160px]">
       {/* 列头 */}
@@ -37,7 +38,7 @@ export default function BoardColumn({ stage, label, applications }: Props) {
             ) : null}
 
             {applications.map((app, index) => (
-              <ApplicationCard key={app.id} application={app} index={index} />
+              <ApplicationCard key={app.id} application={app} index={index} onDelete={onDelete} />
             ))}
 
             {provided.placeholder}

@@ -10,7 +10,7 @@ import Spinner from '../components/Spinner'
 import type { Stage } from '../types'
 
 export default function Board() {
-  const { applications, isLoading, fetchApplications, updateApplication } = useAppStore()
+  const { applications, isLoading, fetchApplications, updateApplication, removeApplication } = useAppStore()
   const [showModal, setShowModal] = useState(false)
 
   useEffect(() => {
@@ -24,6 +24,16 @@ export default function Board() {
   }, {} as Record<Stage, typeof applications>)
 
   const isEmpty = applications.length === 0
+
+  const handleDelete = async (id: string) => {
+    removeApplication(id)
+    try {
+      await applicationsApi.remove(id)
+    } catch (err) {
+      fetchApplications()
+      handleApiError(err, '删除失败')
+    }
+  }
 
   const handleDragEnd = async (result: DropResult) => {
     const { draggableId, destination, source } = result
@@ -83,6 +93,7 @@ export default function Board() {
                   stage={stage}
                   label={STAGE_LABELS[stage]}
                   applications={grouped[stage] ?? []}
+                  onDelete={handleDelete}
                 />
               ))}
             </div>
