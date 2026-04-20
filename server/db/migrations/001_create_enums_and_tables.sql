@@ -55,6 +55,7 @@ CREATE TABLE applications (
   job_url       VARCHAR(500),
   notes         TEXT,
   priority      priority_enum NOT NULL DEFAULT '2',
+  referral_code VARCHAR(100),
   created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   CONSTRAINT salary_range_check CHECK (

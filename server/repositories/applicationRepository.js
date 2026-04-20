@@ -57,7 +57,8 @@ const create = async ({ userId, company_name, position, job_type, stage, city, s
      RETURNING *`,
     [userId, company_name, position, job_type || 'daily_internship', stage || 'pending',
      city || null, salary_min || null, salary_max || null,
-     deadline || null, job_url || null, notes || null, priority || '2', referral_code || null]
+     deadline || null, job_url || null, notes || null, priority || '2', referral_code || null
+    ]
   );
   return rows[0];
 };
