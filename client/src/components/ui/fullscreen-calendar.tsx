@@ -56,7 +56,7 @@ export function FullScreenCalendar({ data, onEventClick }: FullScreenCalendarPro
   const [selectedDay, setSelectedDay] = React.useState(today)
   const [currentMonth, setCurrentMonth] = React.useState(format(today, 'MMM-yyyy'))
   const firstDayCurrentMonth = parse(currentMonth, 'MMM-yyyy', new Date())
-  const isDesktop = useMediaQuery('(min-width: 768px)')
+  useMediaQuery('(min-width: 768px)')
 
   const days = eachDayOfInterval({
     start: startOfWeek(firstDayCurrentMonth),

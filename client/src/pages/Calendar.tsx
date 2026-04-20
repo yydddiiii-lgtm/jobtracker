@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { isSameDay } from 'date-fns'
 import { applicationsApi } from '../api/applications'
 import apiClient from '../api/client'
 import { handleApiError } from '../utils/apiError'
