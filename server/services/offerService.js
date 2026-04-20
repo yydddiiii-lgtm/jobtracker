@@ -19,7 +19,15 @@ const createForApplication = async (applicationId, userId, body) => {
   if (!app) throw Errors.notFound('Application not found');
   const existing = await offerRepo.findByApplication(applicationId);
   if (existing) throw Errors.conflict('Offer already exists for this application');
-  return offerRepo.create({ applicationId, ...body });
+  // Pre-populate city from application if not explicitly provided
+  const data = { city: app.city ?? null, ...body };
+  return offerRepo.create({ applicationId, ...data });
+};
+
+const getByApplication = async (applicationId, userId) => {
+  const app = await appRepo.findById(applicationId, userId);
+  if (!app) throw Errors.notFound('Application not found');
+  return offerRepo.findByApplication(applicationId);
 };
 
 const update = async (id, userId, body) => {
@@ -43,4 +51,4 @@ const updateByApplication = async (applicationId, userId, body) => {
   return offerRepo.update(offer.id, fields);
 };
 
-module.exports = { listAll, createForApplication, update, updateByApplication };
+module.exports = { listAll, createForApplication, getByApplication, update, updateByApplication };

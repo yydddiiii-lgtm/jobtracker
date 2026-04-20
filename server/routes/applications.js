@@ -16,6 +16,7 @@ router.post('/:id/interviews', interviewCtrl.create);
 router.get('/:id/documents', documentCtrl.list);
 router.post('/:id/documents', documentCtrl.create);
 
+router.get('/:id/offer', offerCtrl.getByApplication);
 router.post('/:id/offer', offerCtrl.create);
 router.patch('/:id/offer', offerCtrl.updateByApplication);
 router.get('/:id/stage-logs', appCtrl.getStageLogs);

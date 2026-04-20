@@ -7,7 +7,7 @@ import { toast } from '../store/toastStore'
 import { handleApiError } from '../utils/apiError'
 import { STAGE_LABELS, STAGE_ORDER, TERMINAL_STAGES } from '../utils/stage'
 import { format, parseISO } from 'date-fns'
-import type { Application, StageLog, Interview, Document } from '../types'
+import type { Application, StageLog, Interview, Document, Offer } from '../types'
 import Spinner from '../components/Spinner'
 import DeadlineBadge from '../components/DeadlineBadge'
 import InterviewPanel from '../components/InterviewPanel'
@@ -38,6 +38,7 @@ export default function ApplicationDetail() {
   const [stageLogs, setStageLogs] = useState<StageLog[]>([])
   const [interviews, setInterviews] = useState<Interview[]>([])
   const [documents, setDocuments] = useState<Document[]>([])
+  const [offer, setOffer] = useState<Offer | null>(null)
   const [loading, setLoading] = useState(true)
   const [editMode, setEditMode] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -50,16 +51,18 @@ export default function ApplicationDetail() {
     const load = async () => {
       setLoading(true)
       try {
-        const [appRes, logsRes, intRes, docRes] = await Promise.all([
+        const [appRes, logsRes, intRes, docRes, offerRes] = await Promise.all([
           applicationsApi.getById(id),
           applicationsApi.getStageLogs(id),
           apiClient.get(`/applications/${id}/interviews`),
           apiClient.get(`/applications/${id}/documents`),
+          apiClient.get(`/applications/${id}/offer`),
         ])
         setApp(appRes.data.data.application)
         setStageLogs(logsRes.data.data.stage_logs ?? [])
         setInterviews(intRes.data.data.interviews ?? [])
         setDocuments(docRes.data.data.documents ?? [])
+        setOffer(offerRes.data.data.offer)
         reset(appRes.data.data.application)
       } catch (err) {
         handleApiError(err, '加载申请详情失败')
@@ -221,6 +224,28 @@ export default function ApplicationDetail() {
             </div>
           </div>
         </div>
+
+        {/* Offer 接受状态 */}
+        {offer && (
+          <div className="flex items-center gap-2 mb-3">
+            <span className="text-xs text-gray-400">Offer 决定：</span>
+            {offer.is_accepted === true && (
+              <span className="px-2 py-0.5 bg-green-50 text-green-600 rounded-full text-xs font-medium border border-green-200">已接受 🎉</span>
+            )}
+            {offer.is_accepted === false && (
+              <span className="px-2 py-0.5 bg-red-50 text-red-500 rounded-full text-xs font-medium border border-red-200">已拒绝</span>
+            )}
+            {offer.is_accepted === null && (
+              <span className="px-2 py-0.5 bg-gray-100 text-gray-400 rounded-full text-xs">待决定</span>
+            )}
+            {offer.base_salary && (
+              <span className="text-xs text-gray-500">· {offer.base_salary.toLocaleString()} 元/月</span>
+            )}
+            {offer.city && offer.city !== app.city && (
+              <span className="text-xs text-gray-500">· {offer.city}</span>
+            )}
+          </div>
+        )}
 
         {/* 信息展示 / 编辑 */}
         {editMode ? (

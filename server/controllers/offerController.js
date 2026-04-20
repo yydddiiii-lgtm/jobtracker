@@ -37,4 +37,13 @@ const updateByApplication = async (req, res, next) => {
   }
 };
 
-module.exports = { list, create, update, updateByApplication };
+const getByApplication = async (req, res, next) => {
+  try {
+    const offer = await offerService.getByApplication(req.params.id, req.user.id);
+    success(res, { offer: offer ?? null });
+  } catch (err) {
+    next(err);
+  }
+};
+
+module.exports = { list, create, getByApplication, update, updateByApplication };
