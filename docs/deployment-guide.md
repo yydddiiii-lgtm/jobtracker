@@ -4,15 +4,10 @@
 
 | 项目 | 值 |
 |------|-----|
-| 公网 IP | `123.56.244.199` |
 | 系统 | Ubuntu 22.04 64位 |
-| 配置 | 2核 2G |
-| 地域 | 华北2（北京） |
+| 配置 | 2核 2G（最低配置） |
 | 登录用户 | root |
-| 登录密码 | Yangdi123 |
-| 实例ID | i-2ze69xmhrsl1zb525cjw |
-
-> ⚠️ 注意：这个文件包含密码，不要提交到 GitHub 公开仓库。
+| 云服务商 | 阿里云 ECS |
 
 ---
 
@@ -20,7 +15,7 @@
 
 ```
 用户浏览器
-    ↓ 访问 http://123.56.244.199
+    ↓ 访问 http://你的服务器公网IP
 Nginx（门卫，80端口）
     ├── /api/* 请求 → 转发给后端（localhost:4000）
     └── 其他请求   → 返回前端静态文件（client/dist/）
@@ -60,8 +55,8 @@ jobtracker/
 
 ### 2. SSH 连接服务器
 ```bash
-ssh root@123.56.244.199
-# 输入密码：Yangdi123
+ssh root@你的服务器公网IP
+# 输入购买服务器时设置的密码
 ```
 SSH = 远程控制服务器的方式，就像远程桌面，但只有黑色终端，没有图形界面。
 
@@ -88,7 +83,7 @@ apt install -y git
 ### 4. 拉取代码
 ```bash
 cd /root
-git clone https://github.com/yydddiiii-lgtm/jobtracker.git
+git clone https://github.com/你的用户名/jobtracker.git
 cd jobtracker
 ```
 
@@ -99,7 +94,7 @@ su - postgres
 psql
 
 # 在 psql 里执行：
-CREATE USER jobtracker WITH PASSWORD 'jobtracker123';
+CREATE USER jobtracker WITH PASSWORD '你设置的数据库密码';
 CREATE DATABASE jobtracker OWNER jobtracker;
 GRANT ALL PRIVILEGES ON DATABASE jobtracker TO jobtracker;
 \q
@@ -112,9 +107,9 @@ exit
 ```bash
 cd /root/jobtracker/server
 
-psql postgresql://jobtracker:jobtracker123@localhost:5432/jobtracker -f db/migrations/001_create_enums_and_tables.sql
-psql postgresql://jobtracker:jobtracker123@localhost:5432/jobtracker -f db/migrations/002_add_referral_code.sql
-psql postgresql://jobtracker:jobtracker123@localhost:5432/jobtracker -c "ALTER TYPE job_type_enum ADD VALUE IF NOT EXISTS 'summer_internship'; ALTER TYPE job_type_enum ADD VALUE IF NOT EXISTS 'winter_internship'; ALTER TYPE job_type_enum ADD VALUE IF NOT EXISTS 'fulltime';"
+psql postgresql://jobtracker:你设置的数据库密码@localhost:5432/jobtracker -f db/migrations/001_create_enums_and_tables.sql
+psql postgresql://jobtracker:你设置的数据库密码@localhost:5432/jobtracker -f db/migrations/002_add_referral_code.sql
+psql postgresql://jobtracker:你设置的数据库密码@localhost:5432/jobtracker -c "ALTER TYPE job_type_enum ADD VALUE IF NOT EXISTS 'summer_internship'; ALTER TYPE job_type_enum ADD VALUE IF NOT EXISTS 'winter_internship'; ALTER TYPE job_type_enum ADD VALUE IF NOT EXISTS 'fulltime';"
 ```
 
 ### 7. 配置后端环境变量
@@ -127,7 +122,7 @@ nano .env
 ```
 PORT=4000
 NODE_ENV=production
-DATABASE_URL=postgresql://jobtracker:jobtracker123@localhost:5432/jobtracker
+DATABASE_URL=postgresql://jobtracker:你设置的数据库密码@localhost:5432/jobtracker
 JWT_SECRET=your_super_secret_key_change_this
 JWT_ACCESS_EXPIRES_IN=2h
 JWT_REFRESH_EXPIRES_IN=7d
@@ -166,7 +161,7 @@ nano /etc/nginx/sites-available/jobtracker
 ```nginx
 server {
     listen 80;
-    server_name 123.56.244.199;
+    server_name 你的服务器公网IP;
 
     location /api {
         proxy_pass http://localhost:4000;
@@ -211,7 +206,7 @@ systemctl restart nginx
 每次修改代码后，在服务器上执行：
 
 ```bash
-ssh root@123.56.244.199
+ssh root@你的服务器公网IP
 
 cd /root/jobtracker
 git pull                   # 从GitHub拉取最新代码
@@ -250,6 +245,60 @@ cat /var/log/nginx/error.log | tail -20
 ---
 
 ## 概念解释（从零开始）
+
+### 什么叫"部署上线"？
+本地开发时，网站只在你自己电脑上跑，别人打不开。
+"部署上线"就是把代码搬到一台 24 小时开机、有公网 IP 的服务器上，让全世界都能访问。
+三步：① 买服务器 → ② 把代码放上去 → ③ 启动服务
+
+### 什么是 SSH？
+SSH 是远程控制服务器的方式，就像远程桌面，但只有黑色终端，没有图形界面。
+在本地终端输入 `ssh root@服务器IP`，输完密码就像坐在服务器前面打命令一样。
+密码登录和 SSH 密钥登录是两种验证身份的方式，作用相同，密钥更安全。
+
+### 什么是实例/主机/实例ID？
+买服务器就是在云平台（阿里云/腾讯云）上创建一个"实例"，也叫"主机"。
+实例 ID 是这台服务器在云平台里的编号，用于在控制台里找到它、管理安全组等。
+平时用不到，只在云平台控制台操作时会看到。
+
+### 什么叫"监听"？
+程序说"我在监听 4000 端口"，意思是：有人来敲 4000 号门，我来接待。
+Nginx 监听 80 端口 = 有人访问网站（默认走 80 端口），Nginx 来处理。
+后端监听 4000 端口 = 有 API 请求过来，后端来处理。
+
+### 什么叫"默认欢迎页"？
+安装 Nginx 后，没有配置任何网站时，访问服务器 IP 会看到一个 Nginx 官方的欢迎页面（"Welcome to nginx!"）。
+这说明 Nginx 装好了，但还没有配置你自己的网站。把你的配置文件加进去重启 Nginx 就会换成你的网站。
+
+### 什么叫"数据库迁移"？
+迁移 = 用代码自动建表。
+数据库刚创建时是空的，需要把建表的 SQL 命令跑一遍，把 users、jobs 这些表结构建好。
+这个过程叫"执行迁移"，相当于装修房子时按图纸隔墙、布线。
+
+### 什么是 Docker？容器是什么？
+Docker 是一个"集装箱工厂"，每个服务（数据库、后端、前端）跑在自己的"集装箱（容器）"里，互不干扰。
+容器就像一个迷你虚拟机：里面有完整的运行环境（Node.js、PostgreSQL 等），但比虚拟机轻很多。
+在服务器上，没有人手动启动服务，Docker 代替你管理所有容器的启动、重启、通信。
+
+### 什么是 Docker 镜像？
+镜像是容器的"模板/说明书"，比如 `postgres:15` 就是官方做好的 PostgreSQL 镜像。
+用镜像创建容器，就像用模具制造零件。镜像本身不运行，容器才是跑起来的实体。
+
+### docker run vs docker-compose 的区别？
+- `docker run`：手动启动一个容器，适合本地开发时单独跑数据库
+- `docker-compose`：用一个配置文件同时管理多个容器（数据库+后端+前端），适合生产部署
+
+本地开发时只用 `docker run` 跑数据库，你手动启动前后端。
+服务器上用 `docker-compose`，一条命令把所有服务全部启动。
+
+### Docker 部署的四个配置文件分别是什么？
+| 文件 | 作用 |
+|------|------|
+| `docker-compose.yml` | 总指挥：定义启动哪些容器、如何互相通信 |
+| `server/Dockerfile` | 后端容器制造说明：装 Node.js、复制代码、npm install、启动 |
+| `client/Dockerfile` | 前端容器制造说明：先 build 编译，再用 Nginx 托管静态文件 |
+| `nginx.conf` | 前端容器里的门卫：`/api` 转发后端，其他返回页面 |
+| `.env.example` | 环境变量填空模板：列出需要哪些变量，值留空，部署时复制并填真实值 |
 
 ### 端口是什么？
 服务器就像一栋楼，IP地址是楼的门牌号，端口是楼里每个房间的编号。
